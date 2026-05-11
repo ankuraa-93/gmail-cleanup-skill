@@ -56,9 +56,10 @@ The auth URL will appear in the terminal. **Open it in the browser for the user 
 
 Before proceeding, ask:
 - "Are there specific types of email you want to keep? For example: emails with PDF attachments, specific newsletters, or emails from certain senders?"
+- "For transactional emails (order confirmations, shipping updates, payment receipts) — would you like them labeled and moved out of your inbox, or just labeled so you can visually distinguish them while keeping them in your inbox?"
 - "Any other preferences I should know about before we start?"
 
-Record their preferences in `progress.md`.
+Record their preferences in `progress.md`, including the Status Updates preference (archive vs. label-only). This must survive `/clear` and session breaks since it affects cleanup and filter behavior in later phases.
 
 ### 1e. Capture baseline stats
 
@@ -108,33 +109,33 @@ Write the classification to `sender_classification.txt` with sections for each c
 ========== RELEVANT ==========
 (These senders will be left alone)
 
-amazon.in (50) — Order deliveries, shipping updates
-axis.bank.in (94) — Debit/credit alerts, monthly statements
+example-bank.com (94) — Transaction alerts, monthly statements
+example-employer.com (12) — Payslips, HR updates
 
 ========== STATUS UPDATE ==========
-(These senders will be labeled "Status Updates" and archived out of inbox)
+(These senders will be labeled "Status Updates" — kept in inbox or archived based on your preference)
 
-razorpay.com (6) — Payment confirmations, refund tracking
-delhivery.com (7) — Delivery tracking
+example-delivery.com (7) — Delivery tracking
+example-payments.com (6) — Payment confirmations
 
 ========== PROMO ==========
 (These senders will be trashed)
 
-mailers.hdfcbank.bank.in (19) — Bank cross-selling, "LIFETIME FREE 2nd Card"
-info.bigbasket.com (6) — Recipe contests, promos
+marketing.example-store.com (19) — Sales, discount offers
+deals.example-app.com (6) — Engagement bait, contests
 
 ========== SPAM ==========
 (These senders will be trashed)
 
-...
+unknown-sender.com (3) — Unsolicited offers
 
 ========== REQUIRES REVIEW ==========
 (Move these to another section before proceeding)
 
-uber.com (24) — Mix of trip receipts and "25% off" promos
+example-rideshare.com (24) — Mix of trip receipts and discount promos
 ```
 
-Tell the user: "Edit this file to move senders between sections, then let me know when you're done. Senders in PROMO and SPAM will be trashed. STATUS UPDATE senders will be labeled and archived out of your inbox. RELEVANT senders will be left alone."
+Tell the user: "Edit this file to move senders between sections, then let me know when you're done. Senders in PROMO and SPAM will be trashed. STATUS UPDATE senders will be labeled (and archived if you chose that option). RELEVANT senders will be left alone."
 
 ---
 
@@ -160,10 +161,14 @@ Work through the classification file:
 npx @googleworkspace/cli gmail users messages batchModify --params '{"userId":"me"}' --json '{"ids":["id1","id2",...],"removeLabelIds":["INBOX"],"addLabelIds":["TRASH"]}'
 ```
 
-2. **STATUS UPDATE**: Label as "Status Updates" + remove from inbox (archive):
+2. **STATUS UPDATE**: Label as "Status Updates". If the user chose to archive, also remove from inbox. If they chose to keep in inbox, only add the label.
 
 ```bash
+# Archive (label + remove from inbox)
 npx @googleworkspace/cli gmail users messages batchModify --params '{"userId":"me"}' --json '{"ids":["id1","id2",...],"removeLabelIds":["INBOX"],"addLabelIds":["Label_ID"]}'
+
+# Keep in inbox (label only)
+npx @googleworkspace/cli gmail users messages batchModify --params '{"userId":"me"}' --json '{"ids":["id1","id2",...],"addLabelIds":["Label_ID"]}'
 ```
 
 3. **RELEVANT**: Leave alone
@@ -171,21 +176,28 @@ npx @googleworkspace/cli gmail users messages batchModify --params '{"userId":"m
 
 ### 3c. Create Gmail filter for Status Updates
 
-Auto-label + skip inbox for future emails from status update senders:
+Create a filter for future emails from status update senders. If the user chose to archive, skip inbox. If they chose to keep in inbox, only add the label.
 
 ```bash
+# Archive (label + skip inbox)
 npx @googleworkspace/cli gmail users settings filters create --params '{"userId":"me"}' --json '{
   "criteria": {"from": "from:sender1.com OR from:sender2.com OR ..."},
   "action": {"addLabelIds": ["Label_ID"], "removeLabelIds": ["INBOX"]}
 }'
+
+# Keep in inbox (label only)
+npx @googleworkspace/cli gmail users settings filters create --params '{"userId":"me"}' --json '{
+  "criteria": {"from": "from:sender1.com OR from:sender2.com OR ..."},
+  "action": {"addLabelIds": ["Label_ID"]}
+}'
 ```
 
-If promo subdomains share a base domain with legitimate senders (e.g., `mailers.hdfcbank.bank.in` is promo but `hdfcbank.bank.in` is transactional), use the filter's `negatedQuery` field to exclude them:
+If promo subdomains share a base domain with legitimate senders (e.g., `marketing.example-bank.com` is promo but `example-bank.com` is transactional), use the filter's `negatedQuery` field to exclude them:
 
 ```json
 "criteria": {
-  "from": "from:hdfcbank.bank.in OR ...",
-  "negatedQuery": "from:mailers.hdfcbank.bank.in OR from:info.bigbasket.com"
+  "from": "from:example-bank.com OR ...",
+  "negatedQuery": "from:marketing.example-bank.com OR from:deals.example-store.com"
 }
 ```
 
@@ -279,7 +291,7 @@ Capture final label counts from the Gmail API for accurate before/after comparis
 
 - **NDJSON output**: When using `--page-all`, the gws CLI outputs one JSON object per page (NDJSON), not a single JSON array. You must parse each object separately — use `json.JSONDecoder().raw_decode()` in a loop, not `json.loads()` on the full output.
 - **`--json` not `--body`**: The gws CLI uses `--json` to pass request body data. Do NOT use `--body` — it will error with "unexpected argument."
-- **Gmail `from:` is substring**: `from:bigbasket.com` matches both `bigbasket.com` and `info.bigbasket.com`. Use `negatedQuery` in filters to exclude promo subdomains that share a base domain with legitimate senders.
+- **Gmail `from:` is substring**: `from:example.com` matches both `example.com` and `promo.example.com`. Use `negatedQuery` in filters to exclude promo subdomains that share a base domain with legitimate senders.
 
 ---
 
