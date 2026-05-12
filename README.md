@@ -31,7 +31,11 @@ A Claude Code skill that guides you through a complete Gmail inbox cleanup using
 
 The skill will walk you through the Google Cloud setup if you haven't done it before.
 
-## Installation
+## Quick Install
+
+Paste this repo's URL into Claude Code and ask it to install the skill. It will handle the rest.
+
+## Manual Installation
 
 ### Option 1: Project-level (recommended)
 
