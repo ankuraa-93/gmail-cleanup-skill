@@ -1,0 +1,12 @@
+{
+  "name": "gmail-cleanup-skill",
+  "description": "Gmail inbox cleanup skill — scan, classify, bulk trash, create filters, and auto-unsubscribe using the Google Workspace CLI",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ankur Agarwal"
+  },
+  "homepage": "https://github.com/ankuraa-93/gmail-cleanup-skill",
+  "repository": "https://github.com/ankuraa-93/gmail-cleanup-skill",
+  "license": "MIT",
+  "keywords": ["gmail", "email", "cleanup", "productivity", "google-workspace"]
+}

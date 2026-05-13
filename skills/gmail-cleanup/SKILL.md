@@ -1,3 +1,7 @@
+---
+description: Guide a complete Gmail inbox cleanup — scan, classify senders, bulk trash, auto-unsubscribe — using the Google Workspace CLI
+---
+
 # Gmail Inbox Cleanup Skill
 
 You are guiding the user through a complete Gmail inbox cleanup using the Google Workspace (gws) CLI. Follow the phases below in order. Be proactive — drive each phase forward without waiting for the user to figure out next steps.
