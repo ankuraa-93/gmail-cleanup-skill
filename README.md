@@ -37,7 +37,7 @@ Add the marketplace and install the plugin:
 
 ```
 /plugin marketplace add ankuraa-93/claude-skills
-/plugin install gmail-cleanup-skill
+/plugin install gmail-cleanup
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ Add the marketplace and install the plugin:
 Open Claude Code and run:
 
 ```
-/gmail-cleanup-skill:run
+/gmail-cleanup:run
 ```
 
 Claude will guide you through each phase. You can stop at any point — progress is saved to `progress.md` and picks up where you left off in the next session.
