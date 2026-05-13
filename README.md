@@ -31,26 +31,13 @@ A Claude Code skill that guides you through a complete Gmail inbox cleanup using
 
 The skill will walk you through the Google Cloud setup if you haven't done it before.
 
-## Quick Install
+## Installation
 
-Paste this repo's URL into Claude Code and ask it to install the skill. It will handle the rest.
+Add the marketplace and install the plugin:
 
-## Manual Installation
-
-### Option 1: Project-level (recommended)
-
-Copy the skill file into your project's `.claude/commands/` directory:
-
-```bash
-mkdir -p .claude/commands
-curl -o .claude/commands/gmail-cleanup.md https://raw.githubusercontent.com/ankuraa93/gmail-cleanup-skill/main/gmail-cleanup.md
 ```
-
-### Option 2: Global (available in all projects)
-
-```bash
-mkdir -p ~/.claude/commands
-curl -o ~/.claude/commands/gmail-cleanup.md https://raw.githubusercontent.com/ankuraa93/gmail-cleanup-skill/main/gmail-cleanup.md
+/plugin marketplace add ankuraa-93/claude-skills
+/plugin install gmail-cleanup-skill
 ```
 
 ## Usage
@@ -58,7 +45,7 @@ curl -o ~/.claude/commands/gmail-cleanup.md https://raw.githubusercontent.com/an
 Open Claude Code and run:
 
 ```
-/gmail-cleanup
+/gmail-cleanup-skill:run
 ```
 
 Claude will guide you through each phase. You can stop at any point — progress is saved to `progress.md` and picks up where you left off in the next session.
